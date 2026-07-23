@@ -5,6 +5,7 @@ from pathlib import Path
 
 from cli.convert import ConvertOptions, convert_paths, parse_quality
 from cli.utils import available_extensions, normalize_extension
+from importlib.metadata import version, PackageNotFoundError
 
 def _build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
@@ -27,6 +28,8 @@ def _build_parser() -> argparse.ArgumentParser:
     convert_parser.add_argument("--quality", help="Quality for JPEG/WEBP/AVIF (1-100)")
 
     subparsers.add_parser("list-formats", help="List supported extensions")
+
+    subparsers.add_parser("version", help="Show version")
 
     return parser
 
@@ -57,6 +60,16 @@ def _handle_convert(args: argparse.Namespace) -> int:
     convert_paths(inputs, options)
     return 0
 
+def get_version() -> str:
+    try:
+        return version("imc-image-converter")
+    except PackageNotFoundError:
+        return "0.0.0"
+
+def _handle_version() -> int:
+    print(get_version())
+    return 0
+
 def main() -> None:
     parser = _build_parser()
     args = parser.parse_args()
@@ -65,5 +78,6 @@ def main() -> None:
         raise SystemExit(_handle_list_formats())
     if args.command == "convert":
         raise SystemExit(_handle_convert(args))
-
+    if args.command == "version":
+        raise SystemExit(_handle_version())
     raise SystemExit(1)

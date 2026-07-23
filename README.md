@@ -1,9 +1,9 @@
 # ImC Image Converter
 
-Fast, simple image format conversion for files. Built on Pillow and designed for clean CLI usage.
+Fast, simple image format conversion for files. Built on Pillow
 
 ## Features
-- Convert between many formats (`png`, `jpg`, `webp`, and more).
+- Convert between many formats (`png`, `jpg`, `webp` and more).
 - Batch conversion for files and directories.
 - Optional recursive traversal.
 - Optional removal of source files after successful conversion.
@@ -13,26 +13,7 @@ Fast, simple image format conversion for files. Built on Pillow and designed for
 pip install -r requirements.txt
 ```
 
-## Global Installation(Recommended: pipx)
-The most stable cross-platform install is `pipx` because it isolates dependencies and exposes a clean command.
-
-### macOS / Linux
-```bash
-./scripts/install.sh
-```
-
-### Windows (PowerShell)
-```powershell
-.\scripts\install.ps1
-```
-
-After install, use like:
-```bash
-imc --help
-imc convert image.webp --to png
-```
-
-## Quick Start CLI without Installation
+## Quick Start
 ```bash
 python main.py list-formats
 python main.py convert image.webp --to png
@@ -83,9 +64,3 @@ Set quality for JPEG/WEBP/AVIF:
 ```bash
 python main.py convert image.png --to jpg --quality 85
 ```
-
-## CLI Name
-The global command name is `imc`.
-
-## Notes
-- Use `list-formats` to see the exact extensions supported on your machine.
