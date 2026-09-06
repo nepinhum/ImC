@@ -1,6 +1,6 @@
 [project]
 name = "imc-image-converter"
-version = "0.0.2.dev0"
+version = "0.0.2"
 description = "Fast, simple image format conversion for files."
 readme = "README.md"
 requires-python = ">=3.10"
