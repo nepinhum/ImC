@@ -9,23 +9,34 @@ Fast, simple image format conversion for files. Built on Pillow
 - Optional removal of source files after successful conversion.
 
 ## Setup
+
+For normal CLI usage:
+
 ```bash
-pip install -r requirements.txt
+pipx install .
+imc --help
+```
+
+For local development:
+
+```bash
+python -m pip install -e ".[dev]"
+python main.py --help
 ```
 
 ## Quick Start
 ```bash
-python main.py list-formats
-python main.py convert image.webp --to png
-python main.py convert images/ --to jpg --recursive --output out
-python main.py convert image.png --to webp --remove-source
+imc list-formats
+imc convert image.webp --to png
+imc convert images/ --to jpg --recursive --output out
+imc convert image.png --to webp --remove-source
 ```
 
 ## Commands
 | Command | Description | Example |
 | --- | --- | --- |
-| `list-formats` | List all supported extensions. | `python main.py list-formats` |
-| `convert` | Convert files or directories to a target format. | `python main.py convert images/ --to png` |
+| `list-formats` | List readable and writable extensions. | `imc list-formats` |
+| `convert` | Convert files or directories to a target format. | `imc convert images/ --to png` |
 
 ## Flags (convert)
 | Flag | Alias | Type | Default | Description |
@@ -39,28 +50,33 @@ python main.py convert image.png --to webp --remove-source
 
 ## Output Rules
 - If `--output` is omitted, converted files are saved next to their sources.
-- If `--output` is a directory, outputs go inside it.
-- If converting a directory with `--recursive`, the folder structure is preserved inside the output directory.
-- If multiple inputs are provided, `--output` must be a directory.
-- If a folder input is provided, `--output` must be a directory.
+- For multiple inputs or any folder input, `--output` is always treated as an output directory.
+- For one explicit file input, an existing `--output` directory receives the converted file.
+- For one explicit file input, a non-existing `--output` path with a suffix is treated as the output file path.
+- Recursive folder conversion preserves paths relative to the input folder inside the output directory.
+- When recursively converting multiple folder inputs to one output directory, each input folder name is preserved under the output directory.
 
 ## Usage Examples
 Convert a single file to PNG:
 ```bash
-python main.py convert image.webp --to png
+imc convert image.webp --to png
 ```
 
 Convert a folder recursively and delete originals:
 ```bash
-python main.py convert photos/ --to jpg --recursive --remove-source
+imc convert photos/ --to jpg --recursive --remove-source
 ```
 
 Save outputs to a different directory:
 ```bash
-python main.py convert photos/ --to webp --recursive --output converted/
+imc convert photos/ --to webp --recursive --output converted/
 ```
 
 Set quality for JPEG/WEBP/AVIF:
 ```bash
-python main.py convert image.png --to jpg --quality 85
+imc convert image.png --to jpg --quality 85
 ```
+
+## Notes
+- Metadata such as EXIF, ICC profiles, orientation tags and DPI is not preserved.
+- When converting transparent images to JPEG, transparency is discarded by converting the image to RGB.
