@@ -77,6 +77,10 @@ def validate_conversions(
     conversions: list[Conversion], options: ConvertOptions
 ) -> None:
     for conversion in conversions:
+        if conversion.source.resolve() == conversion.target.resolve():
+            raise ValueError(
+                f"Source and target are the same file: {conversion.source}"
+            )
         if conversion.target.exists() and not options.overwrite:
             raise FileExistsError(f"Target already exists: {conversion.target}")
 

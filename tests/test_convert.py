@@ -56,3 +56,15 @@ def test_existing_target_preflight_does_not_partially_convert(tmp_path: Path):
     assert not (tmp_path / "first.png").exists()
     assert first.exists()
     assert second.exists()
+
+
+def test_remove_source_never_deletes_same_target_path(tmp_path: Path):
+    source = make_image(tmp_path / "image.png")
+
+    with pytest.raises(ValueError, match="Source and target are the same file"):
+        convert_paths(
+            [source],
+            options(target_extension=".png", overwrite=True, remove_source=True),
+        )
+
+    assert source.exists()
