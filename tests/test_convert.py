@@ -95,3 +95,13 @@ def test_recursive_conversion_skips_existing_output_tree(tmp_path: Path):
     assert existing_output.exists()
     assert not (root / "converted" / "converted" / "old.webp").exists()
     assert source.exists()
+
+
+def test_explicit_non_image_file_is_not_converted(tmp_path: Path):
+    source = tmp_path / "README.md"
+    source.write_text("# not an image\n", encoding="utf-8")
+
+    converted = convert_paths([source], options(target_extension=".png"))
+
+    assert converted == []
+    assert not (tmp_path / "README.png").exists()
