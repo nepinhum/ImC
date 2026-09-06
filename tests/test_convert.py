@@ -5,6 +5,7 @@ from PIL import Image
 
 from cli.convert import ConvertOptions, convert_paths
 
+
 def make_image(path: Path, mode: str = "RGB") -> Path:
     path.parent.mkdir(parents=True, exist_ok=True)
     if mode == "RGBA":
@@ -13,6 +14,7 @@ def make_image(path: Path, mode: str = "RGB") -> Path:
         image = Image.new(mode, (2, 2), (255, 0, 0))
     image.save(path)
     return path
+
 
 def options(
     *,
@@ -31,6 +33,7 @@ def options(
         remove_source=remove_source,
         quality=quality,
     )
+
 
 def test_single_file_converts_next_to_source(tmp_path: Path):
     source = make_image(tmp_path / "image.webp")

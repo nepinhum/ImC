@@ -13,6 +13,7 @@ from cli.utils import (
     prepare_image_for_format,
 )
 
+
 @dataclass(frozen=True)
 class ConvertOptions:
     target_extension: str
@@ -21,6 +22,7 @@ class ConvertOptions:
     overwrite: bool
     remove_source: bool
     quality: int | None
+
 
 def _target_path(source: Path, base_dir: Path, options: ConvertOptions) -> Path:
     target_name = source.stem + options.target_extension
@@ -33,7 +35,10 @@ def _target_path(source: Path, base_dir: Path, options: ConvertOptions) -> Path:
         return options.output / relative.with_suffix(options.target_extension)
     return options.output / target_name
 
-def _save_image(img: Image.Image, target: Path, target_format: str, quality: int | None) -> None:
+
+def _save_image(
+    img: Image.Image, target: Path, target_format: str, quality: int | None
+) -> None:
     target.parent.mkdir(parents=True, exist_ok=True)
     save_kwargs = {}
     if quality is not None and target_format.upper() in {"JPEG", "JPG", "WEBP", "AVIF"}:
@@ -41,6 +46,7 @@ def _save_image(img: Image.Image, target: Path, target_format: str, quality: int
     if target_format.upper() == "PNG":
         save_kwargs["optimize"] = True
     img.save(target, format=target_format, **save_kwargs)
+
 
 def _convert_one(source: Path, base_dir: Path, options: ConvertOptions) -> Path:
     target_format = format_for_extension(options.target_extension)
@@ -57,6 +63,7 @@ def _convert_one(source: Path, base_dir: Path, options: ConvertOptions) -> Path:
 
     return target
 
+
 def convert_paths(paths: Iterable[Path], options: ConvertOptions) -> list[Path]:
     converted = []
     for path in paths:
@@ -64,6 +71,7 @@ def convert_paths(paths: Iterable[Path], options: ConvertOptions) -> list[Path]:
         for source in collect_images(path, options.recursive):
             converted.append(_convert_one(source, base_dir, options))
     return converted
+
 
 def parse_quality(value: str | None) -> int | None:
     if value is None:

@@ -7,6 +7,7 @@ from cli.convert import ConvertOptions, convert_paths, parse_quality
 from cli.utils import available_extensions, normalize_extension
 from importlib.metadata import version, PackageNotFoundError
 
+
 def _build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="converter",
@@ -14,12 +15,20 @@ def _build_parser() -> argparse.ArgumentParser:
     )
     subparsers = parser.add_subparsers(dest="command", required=True)
 
-    convert_parser = subparsers.add_parser("convert", help="Convert files or directories")
+    convert_parser = subparsers.add_parser(
+        "convert", help="Convert files or directories"
+    )
     convert_parser.add_argument("input", nargs="+", help="File or directory path(s)")
-    convert_parser.add_argument("--to", "-t", required=True, help="Target extension (png, jpg, webp, ...)")
+    convert_parser.add_argument(
+        "--to", "-t", required=True, help="Target extension (png, jpg, webp, ...)"
+    )
     convert_parser.add_argument("--output", "-o", help="Output directory or file path")
-    convert_parser.add_argument("--recursive", "-r", action="store_true", help="Convert directories recursively")
-    convert_parser.add_argument("--overwrite", action="store_true", help="Overwrite existing files")
+    convert_parser.add_argument(
+        "--recursive", "-r", action="store_true", help="Convert directories recursively"
+    )
+    convert_parser.add_argument(
+        "--overwrite", action="store_true", help="Overwrite existing files"
+    )
     convert_parser.add_argument(
         "--remove-source",
         action="store_true",
@@ -33,11 +42,13 @@ def _build_parser() -> argparse.ArgumentParser:
 
     return parser
 
+
 def _handle_list_formats() -> int:
     extensions = sorted(available_extensions().keys())
     print("Supported extensions:")
     print(" ".join(extensions))
     return 0
+
 
 def _handle_convert(args: argparse.Namespace) -> int:
     target_extension = normalize_extension(args.to)
@@ -60,15 +71,18 @@ def _handle_convert(args: argparse.Namespace) -> int:
     convert_paths(inputs, options)
     return 0
 
+
 def get_version() -> str:
     try:
         return version("imc-image-converter")
     except PackageNotFoundError:
         return "0.0.0"
 
+
 def _handle_version() -> int:
     print(get_version())
     return 0
+
 
 def main() -> None:
     parser = _build_parser()

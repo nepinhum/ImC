@@ -5,6 +5,7 @@ from typing import Iterable
 
 from PIL import Image
 
+
 def normalize_extension(ext: str) -> str:
     ext = ext.strip().lower()
     if not ext:
@@ -13,8 +14,10 @@ def normalize_extension(ext: str) -> str:
         ext = "." + ext
     return ext
 
+
 def available_extensions() -> dict[str, str]:
     return {ext.lower(): fmt for ext, fmt in Image.registered_extensions().items()}
+
 
 def format_for_extension(ext: str) -> str:
     extensions = available_extensions()
@@ -22,11 +25,13 @@ def format_for_extension(ext: str) -> str:
         raise ValueError(f"Unsupported extension: {ext}")
     return extensions[ext]
 
+
 def is_image_path(path: Path) -> bool:
     if not path.is_file():
         return False
     extensions = available_extensions()
     return path.suffix.lower() in extensions
+
 
 def collect_images(root: Path, recursive: bool) -> Iterable[Path]:
     if root.is_file():
@@ -36,6 +41,7 @@ def collect_images(root: Path, recursive: bool) -> Iterable[Path]:
     if recursive:
         return [p for p in root.rglob("*") if is_image_path(p)]
     return [p for p in root.iterdir() if is_image_path(p)]
+
 
 def prepare_image_for_format(img: Image.Image, target_format: str) -> Image.Image:
     target_format = target_format.upper()
