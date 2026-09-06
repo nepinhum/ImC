@@ -39,10 +39,10 @@ python main.py convert image.png --to webp --remove-source
 
 ## Output Rules
 - If `--output` is omitted, converted files are saved next to their sources.
-- If `--output` is a directory, outputs go inside it.
-- If converting a directory with `--recursive`, the folder structure is preserved inside the output directory.
-- If multiple inputs are provided, `--output` must be a directory.
-- If a folder input is provided, `--output` must be a directory.
+- For multiple inputs or any folder input, `--output` is always treated as an output directory.
+- For one explicit file input, an existing `--output` directory receives the converted file.
+- For one explicit file input, a non-existing `--output` path with a suffix is treated as the output file path.
+- Recursive folder conversion preserves paths relative to the input folder inside the output directory.
 
 ## Usage Examples
 Convert a single file to PNG:

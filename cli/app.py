@@ -62,16 +62,22 @@ def _handle_list_formats() -> int:
     return 0
 
 
+def _output_is_file(inputs: list[Path], output: Path | None) -> bool:
+    if output is None:
+        return False
+    if len(inputs) != 1 or inputs[0].is_dir():
+        return False
+    if output.exists():
+        return output.is_file()
+    return bool(output.suffix)
+
+
 def _handle_convert(args: argparse.Namespace) -> int:
     target_extension = normalize_extension(args.to)
     output = Path(args.output).expanduser() if args.output else None
     quality = args.quality
     inputs = [Path(value).expanduser() for value in args.input]
 
-    if output is not None and len(inputs) > 1 and output.suffix:
-        raise SystemExit("--output must be a directory when converting multiple inputs")
-    if output is not None and output.suffix and any(path.is_dir() for path in inputs):
-        raise SystemExit("--output must be a directory when converting a folder")
     options = ConvertOptions(
         target_extension=target_extension,
         output=output,
@@ -79,6 +85,7 @@ def _handle_convert(args: argparse.Namespace) -> int:
         overwrite=args.overwrite,
         remove_source=args.remove_source,
         quality=quality,
+        output_is_file=_output_is_file(inputs, output),
     )
     convert_paths(inputs, options)
     return 0

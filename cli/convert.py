@@ -22,6 +22,7 @@ class ConvertOptions:
     overwrite: bool
     remove_source: bool
     quality: int | None
+    output_is_file: bool = False
 
 
 @dataclass(frozen=True)
@@ -35,7 +36,7 @@ def _target_path(source: Path, base_dir: Path, options: ConvertOptions) -> Path:
     target_name = source.stem + options.target_extension
     if options.output is None:
         return source.with_name(target_name)
-    if options.output.is_file() or options.output.suffix:
+    if options.output_is_file:
         return options.output
     if options.recursive and base_dir.is_dir():
         relative = source.relative_to(base_dir)
@@ -46,7 +47,7 @@ def _target_path(source: Path, base_dir: Path, options: ConvertOptions) -> Path:
 def _excluded_output_dirs(path: Path, options: ConvertOptions) -> list[Path]:
     if options.output is None or not options.recursive or not path.is_dir():
         return []
-    if options.output.suffix:
+    if options.output_is_file:
         return []
     try:
         options.output.resolve().relative_to(path.resolve())

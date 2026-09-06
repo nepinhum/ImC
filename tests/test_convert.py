@@ -24,6 +24,7 @@ def options(
     overwrite: bool = False,
     remove_source: bool = False,
     quality: int | None = None,
+    output_is_file: bool = False,
 ) -> ConvertOptions:
     return ConvertOptions(
         target_extension=target_extension,
@@ -32,6 +33,7 @@ def options(
         overwrite=overwrite,
         remove_source=remove_source,
         quality=quality,
+        output_is_file=output_is_file,
     )
 
 
@@ -105,3 +107,17 @@ def test_explicit_non_image_file_is_not_converted(tmp_path: Path):
 
     assert converted == []
     assert not (tmp_path / "README.png").exists()
+
+
+def test_dotted_output_directory_is_allowed_for_folder_input(tmp_path: Path):
+    source_dir = tmp_path / "photos"
+    output_dir = tmp_path / "archive.images"
+    make_image(source_dir / "a.webp")
+
+    converted = convert_paths(
+        [source_dir],
+        options(target_extension=".png", output=output_dir, recursive=False),
+    )
+
+    assert converted == [output_dir / "a.png"]
+    assert (output_dir / "a.png").exists()
