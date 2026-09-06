@@ -4,7 +4,7 @@ import argparse
 from pathlib import Path
 
 from cli.convert import ConvertOptions, convert_paths, parse_quality
-from cli.utils import available_extensions, normalize_extension
+from cli.utils import normalize_extension, readable_extensions, writable_extensions
 from importlib.metadata import version, PackageNotFoundError
 
 
@@ -53,9 +53,12 @@ def _build_parser() -> argparse.ArgumentParser:
 
 
 def _handle_list_formats() -> int:
-    extensions = sorted(available_extensions().keys())
-    print("Supported extensions:")
-    print(" ".join(extensions))
+    readable = sorted(readable_extensions().keys())
+    writable = sorted(writable_extensions().keys())
+    print("Readable:")
+    print(" ".join(readable))
+    print("Writable:")
+    print(" ".join(writable))
     return 0
 
 

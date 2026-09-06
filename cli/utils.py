@@ -15,12 +15,24 @@ def normalize_extension(ext: str) -> str:
     return ext
 
 
-def available_extensions() -> dict[str, str]:
+def readable_extensions() -> dict[str, str]:
     return {ext.lower(): fmt for ext, fmt in Image.registered_extensions().items()}
 
 
+def writable_extensions() -> dict[str, str]:
+    return {
+        ext.lower(): fmt
+        for ext, fmt in Image.registered_extensions().items()
+        if fmt.upper() in Image.SAVE
+    }
+
+
+def available_extensions() -> dict[str, str]:
+    return readable_extensions()
+
+
 def format_for_extension(ext: str) -> str:
-    extensions = available_extensions()
+    extensions = writable_extensions()
     if ext not in extensions:
         raise ValueError(f"Unsupported extension: {ext}")
     return extensions[ext]
