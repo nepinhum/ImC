@@ -8,6 +8,13 @@ from cli.utils import available_extensions, normalize_extension
 from importlib.metadata import version, PackageNotFoundError
 
 
+def parse_quality_arg(value: str) -> int:
+    try:
+        return parse_quality(value)
+    except ValueError as exc:
+        raise argparse.ArgumentTypeError(f"invalid quality: {exc}") from exc
+
+
 def _build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="converter",
@@ -34,7 +41,9 @@ def _build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Remove source files after successful conversion",
     )
-    convert_parser.add_argument("--quality", help="Quality for JPEG/WEBP/AVIF (1-100)")
+    convert_parser.add_argument(
+        "--quality", type=parse_quality_arg, help="Quality for JPEG/WEBP/AVIF (1-100)"
+    )
 
     subparsers.add_parser("list-formats", help="List supported extensions")
 
@@ -53,7 +62,7 @@ def _handle_list_formats() -> int:
 def _handle_convert(args: argparse.Namespace) -> int:
     target_extension = normalize_extension(args.to)
     output = Path(args.output).expanduser() if args.output else None
-    quality = parse_quality(args.quality)
+    quality = args.quality
     inputs = [Path(value).expanduser() for value in args.input]
 
     if output is not None and len(inputs) > 1 and output.suffix:
@@ -91,7 +100,10 @@ def main() -> None:
     if args.command == "list-formats":
         raise SystemExit(_handle_list_formats())
     if args.command == "convert":
-        raise SystemExit(_handle_convert(args))
+        try:
+            raise SystemExit(_handle_convert(args))
+        except (ValueError, FileExistsError) as exc:
+            parser.error(str(exc))
     if args.command == "version":
         raise SystemExit(_handle_version())
     raise SystemExit(1)
