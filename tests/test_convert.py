@@ -43,3 +43,16 @@ def test_single_file_converts_next_to_source(tmp_path: Path):
     assert converted == [tmp_path / "image.png"]
     assert (tmp_path / "image.png").is_file()
     assert source.is_file()
+
+
+def test_existing_target_preflight_does_not_partially_convert(tmp_path: Path):
+    first = make_image(tmp_path / "first.webp")
+    second = make_image(tmp_path / "second.webp")
+    make_image(tmp_path / "second.png")
+
+    with pytest.raises(FileExistsError, match="Target already exists"):
+        convert_paths([first, second], options(target_extension=".png"))
+
+    assert not (tmp_path / "first.png").exists()
+    assert first.exists()
+    assert second.exists()

@@ -24,6 +24,13 @@ class ConvertOptions:
     quality: int | None
 
 
+@dataclass(frozen=True)
+class Conversion:
+    source: Path
+    target: Path
+    target_format: str
+
+
 def _target_path(source: Path, base_dir: Path, options: ConvertOptions) -> Path:
     target_name = source.stem + options.target_extension
     if options.output is None:
@@ -48,29 +55,49 @@ def _save_image(
     img.save(target, format=target_format, **save_kwargs)
 
 
-def _convert_one(source: Path, base_dir: Path, options: ConvertOptions) -> Path:
+def plan_conversions(
+    paths: Iterable[Path], options: ConvertOptions
+) -> list[Conversion]:
+    conversions: list[Conversion] = []
     target_format = format_for_extension(options.target_extension)
-    target = _target_path(source, base_dir, options)
-    if target.exists() and not options.overwrite:
-        raise FileExistsError(f"Target already exists: {target}")
-
-    with Image.open(source) as img:
-        prepared = prepare_image_for_format(img, target_format)
-        _save_image(prepared, target, target_format, options.quality)
-
-    if options.remove_source:
-        source.unlink()
-
-    return target
-
-
-def convert_paths(paths: Iterable[Path], options: ConvertOptions) -> list[Path]:
-    converted = []
     for path in paths:
         base_dir = path if path.is_dir() else path.parent
         for source in collect_images(path, options.recursive):
-            converted.append(_convert_one(source, base_dir, options))
-    return converted
+            conversions.append(
+                Conversion(
+                    source=source,
+                    target=_target_path(source, base_dir, options),
+                    target_format=target_format,
+                )
+            )
+    return conversions
+
+
+def validate_conversions(
+    conversions: list[Conversion], options: ConvertOptions
+) -> None:
+    for conversion in conversions:
+        if conversion.target.exists() and not options.overwrite:
+            raise FileExistsError(f"Target already exists: {conversion.target}")
+
+
+def _convert_one(conversion: Conversion, options: ConvertOptions) -> Path:
+    with Image.open(conversion.source) as img:
+        prepared = prepare_image_for_format(img, conversion.target_format)
+        _save_image(
+            prepared, conversion.target, conversion.target_format, options.quality
+        )
+
+    if options.remove_source:
+        conversion.source.unlink()
+
+    return conversion.target
+
+
+def convert_paths(paths: Iterable[Path], options: ConvertOptions) -> list[Path]:
+    conversions = plan_conversions(paths, options)
+    validate_conversions(conversions, options)
+    return [_convert_one(conversion, options) for conversion in conversions]
 
 
 def parse_quality(value: str | None) -> int | None:
