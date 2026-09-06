@@ -65,3 +65,7 @@ Set quality for JPEG/WEBP/AVIF:
 ```bash
 python main.py convert image.png --to jpg --quality 85
 ```
+
+## Notes
+- Metadata such as EXIF, ICC profiles, orientation tags and DPI is not preserved.
+- When converting transparent images to JPEG, transparency is discarded by converting the image to RGB.

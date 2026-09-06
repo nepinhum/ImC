@@ -141,3 +141,13 @@ def test_recursive_multiple_directories_preserve_root_names(tmp_path: Path):
     ]
     assert (output / "cats" / "x" / "a.jpg").exists()
     assert (output / "dogs" / "x" / "a.jpg").exists()
+
+
+def test_rgba_image_converts_to_jpeg_rgb(tmp_path: Path):
+    source = make_image(tmp_path / "alpha.png", mode="RGBA")
+
+    converted = convert_paths([source], options(target_extension=".jpg"))
+
+    assert converted == [tmp_path / "alpha.jpg"]
+    with Image.open(tmp_path / "alpha.jpg") as image:
+        assert image.mode == "RGB"
