@@ -43,6 +43,18 @@ def _target_path(source: Path, base_dir: Path, options: ConvertOptions) -> Path:
     return options.output / target_name
 
 
+def _excluded_output_dirs(path: Path, options: ConvertOptions) -> list[Path]:
+    if options.output is None or not options.recursive or not path.is_dir():
+        return []
+    if options.output.suffix:
+        return []
+    try:
+        options.output.resolve().relative_to(path.resolve())
+    except ValueError:
+        return []
+    return [options.output]
+
+
 def _save_image(
     img: Image.Image, target: Path, target_format: str, quality: int | None
 ) -> None:
@@ -62,7 +74,9 @@ def plan_conversions(
     target_format = format_for_extension(options.target_extension)
     for path in paths:
         base_dir = path if path.is_dir() else path.parent
-        for source in collect_images(path, options.recursive):
+        for source in collect_images(
+            path, options.recursive, _excluded_output_dirs(path, options)
+        ):
             conversions.append(
                 Conversion(
                     source=source,

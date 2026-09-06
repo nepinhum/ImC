@@ -78,3 +78,20 @@ def test_duplicate_targets_are_rejected_before_conversion(tmp_path: Path):
         convert_paths([jpg, png], options(target_extension=".webp", overwrite=True))
 
     assert not (tmp_path / "photo.webp").exists()
+
+
+def test_recursive_conversion_skips_existing_output_tree(tmp_path: Path):
+    root = tmp_path / "photos"
+    source = make_image(root / "a.png")
+    existing_output = make_image(root / "converted" / "old.png")
+
+    converted = convert_paths(
+        [root],
+        options(target_extension=".webp", output=root / "converted", recursive=True),
+    )
+
+    assert converted == [root / "converted" / "a.webp"]
+    assert (root / "converted" / "a.webp").exists()
+    assert existing_output.exists()
+    assert not (root / "converted" / "converted" / "old.webp").exists()
+    assert source.exists()

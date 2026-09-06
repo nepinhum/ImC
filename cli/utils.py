@@ -33,13 +33,36 @@ def is_image_path(path: Path) -> bool:
     return path.suffix.lower() in extensions
 
 
-def collect_images(root: Path, recursive: bool) -> Iterable[Path]:
+def _is_relative_to(path: Path, parent: Path) -> bool:
+    try:
+        path.relative_to(parent)
+        return True
+    except ValueError:
+        return False
+
+
+def collect_images(
+    root: Path,
+    recursive: bool,
+    exclude_dirs: Iterable[Path] = (),
+) -> Iterable[Path]:
+    excluded = [directory.resolve() for directory in exclude_dirs]
     if root.is_file():
-        return [root]
+        return [root] if is_image_path(root) else []
     if not root.is_dir():
         return []
     if recursive:
-        return [p for p in root.rglob("*") if is_image_path(p)]
+        images = []
+        for path in root.rglob("*"):
+            resolved_parent = path.parent.resolve()
+            if any(
+                _is_relative_to(resolved_parent, excluded_dir)
+                for excluded_dir in excluded
+            ):
+                continue
+            if is_image_path(path):
+                images.append(path)
+        return images
     return [p for p in root.iterdir() if is_image_path(p)]
 
 
