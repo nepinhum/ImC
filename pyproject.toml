@@ -1,9 +1,9 @@
 [project]
 name = "imc-image-converter"
-version = "0.0.2-dev"
+version = "0.0.2.dev0"
 description = "Fast, simple image format conversion for files."
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 dependencies = ["Pillow>=10.0.0"]
 
 [project.optional-dependencies]
@@ -22,4 +22,4 @@ pythonpath = ["."]
 
 [tool.black]
 line-length = 88
-target-version = ["py39"]
+target-version = ["py310"]

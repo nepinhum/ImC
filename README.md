@@ -9,23 +9,34 @@ Fast, simple image format conversion for files. Built on Pillow
 - Optional removal of source files after successful conversion.
 
 ## Setup
+
+For normal CLI usage:
+
 ```bash
-pip install -r requirements.txt
+pipx install .
+imc --help
+```
+
+For local development:
+
+```bash
+python -m pip install -e ".[dev]"
+python main.py --help
 ```
 
 ## Quick Start
 ```bash
-python main.py list-formats
-python main.py convert image.webp --to png
-python main.py convert images/ --to jpg --recursive --output out
-python main.py convert image.png --to webp --remove-source
+imc list-formats
+imc convert image.webp --to png
+imc convert images/ --to jpg --recursive --output out
+imc convert image.png --to webp --remove-source
 ```
 
 ## Commands
 | Command | Description | Example |
 | --- | --- | --- |
-| `list-formats` | List all supported extensions. | `python main.py list-formats` |
-| `convert` | Convert files or directories to a target format. | `python main.py convert images/ --to png` |
+| `list-formats` | List readable and writable extensions. | `imc list-formats` |
+| `convert` | Convert files or directories to a target format. | `imc convert images/ --to png` |
 
 ## Flags (convert)
 | Flag | Alias | Type | Default | Description |
@@ -48,22 +59,22 @@ python main.py convert image.png --to webp --remove-source
 ## Usage Examples
 Convert a single file to PNG:
 ```bash
-python main.py convert image.webp --to png
+imc convert image.webp --to png
 ```
 
 Convert a folder recursively and delete originals:
 ```bash
-python main.py convert photos/ --to jpg --recursive --remove-source
+imc convert photos/ --to jpg --recursive --remove-source
 ```
 
 Save outputs to a different directory:
 ```bash
-python main.py convert photos/ --to webp --recursive --output converted/
+imc convert photos/ --to webp --recursive --output converted/
 ```
 
 Set quality for JPEG/WEBP/AVIF:
 ```bash
-python main.py convert image.png --to jpg --quality 85
+imc convert image.png --to jpg --quality 85
 ```
 
 ## Notes
