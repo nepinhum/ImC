@@ -68,3 +68,13 @@ def test_remove_source_never_deletes_same_target_path(tmp_path: Path):
         )
 
     assert source.exists()
+
+
+def test_duplicate_targets_are_rejected_before_conversion(tmp_path: Path):
+    jpg = make_image(tmp_path / "photo.jpg")
+    png = make_image(tmp_path / "photo.png")
+
+    with pytest.raises(ValueError, match="Multiple inputs target the same output"):
+        convert_paths([jpg, png], options(target_extension=".webp", overwrite=True))
+
+    assert not (tmp_path / "photo.webp").exists()

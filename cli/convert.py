@@ -76,11 +76,22 @@ def plan_conversions(
 def validate_conversions(
     conversions: list[Conversion], options: ConvertOptions
 ) -> None:
+    seen_targets: dict[Path, Path] = {}
     for conversion in conversions:
         if conversion.source.resolve() == conversion.target.resolve():
             raise ValueError(
                 f"Source and target are the same file: {conversion.source}"
             )
+
+        resolved_target = conversion.target.resolve()
+        existing_source = seen_targets.get(resolved_target)
+        if existing_source is not None:
+            raise ValueError(
+                f"Multiple inputs target the same output: {conversion.target}"
+            )
+        seen_targets[resolved_target] = conversion.source
+
+    for conversion in conversions:
         if conversion.target.exists() and not options.overwrite:
             raise FileExistsError(f"Target already exists: {conversion.target}")
 
