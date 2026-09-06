@@ -32,7 +32,12 @@ class Conversion:
     target_format: str
 
 
-def _target_path(source: Path, base_dir: Path, options: ConvertOptions) -> Path:
+def _target_path(
+    source: Path,
+    base_dir: Path,
+    options: ConvertOptions,
+    preserve_root_name: bool = False,
+) -> Path:
     target_name = source.stem + options.target_extension
     if options.output is None:
         return source.with_name(target_name)
@@ -40,6 +45,8 @@ def _target_path(source: Path, base_dir: Path, options: ConvertOptions) -> Path:
         return options.output
     if options.recursive and base_dir.is_dir():
         relative = source.relative_to(base_dir)
+        if preserve_root_name:
+            relative = Path(base_dir.name) / relative
         return options.output / relative.with_suffix(options.target_extension)
     return options.output / target_name
 
@@ -71,9 +78,13 @@ def _save_image(
 def plan_conversions(
     paths: Iterable[Path], options: ConvertOptions
 ) -> list[Conversion]:
+    input_paths = list(paths)
+    recursive_directory_count = sum(
+        1 for path in input_paths if path.is_dir() and options.recursive
+    )
     conversions: list[Conversion] = []
     target_format = format_for_extension(options.target_extension)
-    for path in paths:
+    for path in input_paths:
         base_dir = path if path.is_dir() else path.parent
         for source in collect_images(
             path, options.recursive, _excluded_output_dirs(path, options)
@@ -81,7 +92,14 @@ def plan_conversions(
             conversions.append(
                 Conversion(
                     source=source,
-                    target=_target_path(source, base_dir, options),
+                    target=_target_path(
+                        source,
+                        base_dir,
+                        options,
+                        preserve_root_name=(
+                            recursive_directory_count > 1 and path.is_dir()
+                        ),
+                    ),
                     target_format=target_format,
                 )
             )

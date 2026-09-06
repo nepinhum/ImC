@@ -121,3 +121,23 @@ def test_dotted_output_directory_is_allowed_for_folder_input(tmp_path: Path):
 
     assert converted == [output_dir / "a.png"]
     assert (output_dir / "a.png").exists()
+
+
+def test_recursive_multiple_directories_preserve_root_names(tmp_path: Path):
+    cats = tmp_path / "cats"
+    dogs = tmp_path / "dogs"
+    output = tmp_path / "out"
+    make_image(cats / "x" / "a.png")
+    make_image(dogs / "x" / "a.png")
+
+    converted = convert_paths(
+        [cats, dogs],
+        options(target_extension=".jpg", output=output, recursive=True),
+    )
+
+    assert converted == [
+        output / "cats" / "x" / "a.jpg",
+        output / "dogs" / "x" / "a.jpg",
+    ]
+    assert (output / "cats" / "x" / "a.jpg").exists()
+    assert (output / "dogs" / "x" / "a.jpg").exists()
